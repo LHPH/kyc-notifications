@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: kyc-notifications
+  profiles:
+    active: dev
+  jackson:
+    default-property-inclusion: NON_NULL
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    diskspace:
+      enabled: false
+    external-services:
+      enabled: true
+  info:
+    build:
+      enabled: false
+
+kyc-messages:
+  catalog:
+    messages:
+      "000":
+        code: KYC-CAMPAIGNS-000
+        message: Unexpected Error
+        type: ERROR
+      "001":
+        code: KYC-CAMPAIGNS-001
+        message: The request is invalid
+        type: ERROR
+      "002":
+        code: KYC-CAMPAIGNS-002
+        message: The file could not be processed
+        type: ERROR
+      "003":
+        code: KYC-CAMPAIGNS-003
+        message: The operation could not be performed
+        type: ERROR
+      "004":
+        code: KYC-CAMPAIGNS-004
+        message: The key to load the campaign does not exists
+        type: ERROR
+      "005":
+        code: KYC-CAMPAIGNS-005
+        message: The campaign to publish contains errors
+        type: ERROR
+      "006":
+        code: KYC-CAMPAIGNS-006
+        message: It was upload a file with empty content
+        type: WARN
