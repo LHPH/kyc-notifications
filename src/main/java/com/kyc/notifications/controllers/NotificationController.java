@@ -24,12 +24,14 @@ public class NotificationController {
 
     @PostMapping("/notification")
     public ResponseEntity<ResponseData<Void>> addNotification(@RequestHeader("Authorization") String token,
-                                                              @RequestHeader("kyc-customer-id") Long customerId,
+                                                              @RequestHeader("kyc-customer-id-receiver") Long customerId,
+                                                              @RequestHeader("channel") String channel,
                                                               @RequestBody NotificationData notificationData){
 
         Map<String,Object> params = new HashMap<>();
         params.put("sender",token);
         params.put("receiver",customerId);
+        params.put("channel",channel);
 
         RequestData<NotificationData> req = RequestData.<NotificationData>builder()
                 .pathParams(params)
@@ -40,10 +42,12 @@ public class NotificationController {
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<ResponseData<List<NotificationData>>> getNotifications(@RequestHeader("Authorization") String token){
+    public ResponseEntity<ResponseData<List<NotificationData>>> getNotifications(@RequestHeader("Authorization") String token,
+                                                                                 @RequestHeader("channel") String channel){
 
         Map<String,Object> params = new HashMap<>();
         params.put("client",9999);
+        params.put("channel",channel);
 
         RequestData<Void> req = RequestData.<Void>builder()
                 .pathParams(params)

@@ -4,9 +4,15 @@ spring:
     port: 5672
     username: guest
     password: guest
+  redis:
+    host: 127.0.0.1
+    port: 6379
 
 server:
   port: 9003
+
+kyc-config:
+  number-notifications: 10
 
 logging:
   level:
