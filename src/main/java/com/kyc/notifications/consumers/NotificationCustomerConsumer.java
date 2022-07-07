@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class CustomerConsumer {
+public class NotificationCustomerConsumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationCustomerConsumer.class);
 
     @Autowired
     private NotificationService notificationService;

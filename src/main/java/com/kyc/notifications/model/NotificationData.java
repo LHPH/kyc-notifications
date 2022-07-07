@@ -16,11 +16,11 @@ import java.util.Date;
 public class NotificationData {
 
     @NotNull
-    @Pattern(regexp = "^[A-Z\\s\\d]{50}",message = "Invalid format")
+    @Pattern(regexp = "^[A-Z\\s\\d]{1,50}",message = "Invalid format")
     private String message;
 
     @NotNull
-    @Pattern(regexp = "^[A-Z\\s\\d]{15}",message = "Invalid format")
+    @Pattern(regexp = "^[A-Z\\s\\d]{1,15}",message = "Invalid format")
     private String event;
 
     private Date date;

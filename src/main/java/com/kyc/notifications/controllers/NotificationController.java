@@ -46,7 +46,7 @@ public class NotificationController {
                                                                                  @RequestHeader("channel") String channel){
 
         Map<String,Object> params = new HashMap<>();
-        params.put("client",9999);
+        params.put("client",token);
         params.put("channel",channel);
 
         RequestData<Void> req = RequestData.<Void>builder()
