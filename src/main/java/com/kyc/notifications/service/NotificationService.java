@@ -56,7 +56,7 @@ public class NotificationService {
 
                 LOGGER.info("Saving the new notification in redis for {}",clientNumber);
                 redisTemplate.opsForList().leftPush(clientNumber,notificationData);
-                return ResponseData.of(null);
+                return ResponseData.emptyResponse();
             }
 
             LOGGER.warn("The {} exceed the limit of notifications for user",clientNumber);

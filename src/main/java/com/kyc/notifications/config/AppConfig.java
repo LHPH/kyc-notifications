@@ -2,6 +2,7 @@ package com.kyc.notifications.config;
 
 import com.kyc.core.config.BuildDetailConfig;
 import com.kyc.core.config.RedisConfig;
+import com.kyc.core.exception.handlers.KycGenericRestExceptionHandler;
 import com.kyc.core.exception.handlers.KycUnhandledExceptionHandler;
 import com.kyc.core.exception.handlers.KycValidationRestExceptionHandler;
 import com.kyc.core.properties.KycMessages;
@@ -13,7 +14,7 @@ import static com.kyc.notifications.constants.AppConstants.MESSAGE_000;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_001;
 
 @Configuration
-@Import(value = {RedisConfig.class, KycMessages.class, BuildDetailConfig.class})
+@Import(value = {RedisConfig.class, KycMessages.class, BuildDetailConfig.class, KycGenericRestExceptionHandler.class})
 public class AppConfig {
 
     @Bean

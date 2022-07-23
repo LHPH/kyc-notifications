@@ -15,8 +15,7 @@ public class LogRabbitErrorHandler implements RabbitListenerErrorHandler {
     @Override
     public Object handleError(Message message, org.springframework.messaging.Message<?> message1, ListenerExecutionFailedException e) throws Exception {
 
-        LOGGER.error(" ",e);
-
+        LOGGER.warn("In handle error {}",message.getMessageProperties());
         throw e;
     }
 }

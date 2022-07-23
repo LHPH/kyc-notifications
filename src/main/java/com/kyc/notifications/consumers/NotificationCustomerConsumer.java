@@ -11,8 +11,10 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,9 +29,9 @@ public class NotificationCustomerConsumer {
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name="kyc-queue-1",durable = "false"),
             exchange = @Exchange(type = "topic",name = "kyc.customers",durable = "false"),
-            key = "kyc.customers.*")
+            key = "kyc.customers.*"),errorHandler = "logRabbitErrorHandler", returnExceptions = "true"
     )
-    public void receiverMessage(NotificationData notificationData,
+    public void receiverMessage(@Payload @Valid NotificationData notificationData,
                                 @Header(name = "Authorization") String sender,
                                 @Header(name = "kyc-customer-id-receiver") String receiver,
                                 @Header(name = "channel") String channel){
