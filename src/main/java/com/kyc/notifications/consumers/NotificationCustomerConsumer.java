@@ -3,6 +3,7 @@ package com.kyc.notifications.consumers;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.notifications.model.NotificationData;
 import com.kyc.notifications.service.NotificationService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -14,7 +15,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
