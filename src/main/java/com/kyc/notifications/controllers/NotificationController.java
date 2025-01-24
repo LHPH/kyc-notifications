@@ -5,6 +5,7 @@ import com.kyc.core.model.web.ResponseData;
 import com.kyc.notifications.delegate.NotificationDelegate;
 import com.kyc.notifications.model.NotificationData;
 import jakarta.validation.Valid;
+import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -44,16 +45,16 @@ public class NotificationController {
         return delegate.addNotification(req);
     }
 
-    @GetMapping("/notifications")
+    @GetMapping("/")
     public ResponseEntity<ResponseData<List<NotificationData>>> getNotifications(@RequestHeader("Authorization") String token,
                                                                                  @RequestHeader("channel") String channel){
 
         Map<String,Object> params = new HashMap<>();
-        params.put("client",token.replace("Bearer ",""));
+        params.put(HttpHeaders.AUTHORIZATION,token.replace("Bearer ",""));
         params.put("channel",channel);
 
         RequestData<Void> req = RequestData.<Void>builder()
-                .pathParams(params)
+                .headers(params)
                 .build();
 
         return delegate.getNotifications(req);

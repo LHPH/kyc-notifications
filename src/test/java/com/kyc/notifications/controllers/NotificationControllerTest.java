@@ -83,7 +83,7 @@ public class NotificationControllerTest {
         given(delegate.getNotifications(any(RequestData.class)))
                 .willReturn(ResponseEntity.ok(Collections.singleton(notificationData)));
 
-        mockMvc.perform(get("/notifications").headers(httpHeaders))
+        mockMvc.perform(get("/").headers(httpHeaders))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
