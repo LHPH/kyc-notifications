@@ -1,7 +1,6 @@
 package com.kyc.notifications.consumers;
 
-import com.kyc.core.model.web.RequestData;
-import com.kyc.notifications.model.NotificationData;
+import com.kyc.core.model.notifications.NotificationData;
 import com.kyc.notifications.service.NotificationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -15,8 +14,10 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.kyc.core.constants.GeneralConstants.CHANNEL;
+import static com.kyc.core.constants.GeneralConstants.ID_ISSUER;
+import static com.kyc.core.constants.GeneralConstants.ID_RECIPIENT;
+
 
 @Component
 public class NotificationCustomerConsumer {
@@ -32,22 +33,12 @@ public class NotificationCustomerConsumer {
             key = "kyc.customers.*"),errorHandler = "logRabbitErrorHandler", returnExceptions = "true"
     )
     public void receiverMessage(@Payload @Valid NotificationData notificationData,
-                                @Header(name = "Authorization") String sender,
-                                @Header(name = "kyc-customer-id-receiver") String receiver,
-                                @Header(name = "channel") String channel){
+                                @Header(name = ID_ISSUER) String issuer,
+                                @Header(name = ID_RECIPIENT) String recipient,
+                                @Header(name = CHANNEL) String channel){
 
         LOGGER.info("Received message from Rabbit MQ for saving a notification");
-
-        Map<String,Object> params = new HashMap<>();
-        params.put("sender",sender);
-        params.put("receiver",receiver);
-        params.put("channel",channel);
-
-        RequestData<NotificationData> req = RequestData.<NotificationData>builder()
-                .pathParams(params)
-                .body(notificationData)
-                .build();
-        notificationService.addNotification(req);
+        notificationService.addNotification(notificationData,issuer,recipient,channel);
     }
 
 

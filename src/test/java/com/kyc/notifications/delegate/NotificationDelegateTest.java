@@ -1,8 +1,8 @@
 package com.kyc.notifications.delegate;
 
+import com.kyc.core.model.notifications.NotificationData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
-import com.kyc.notifications.model.NotificationData;
 import com.kyc.notifications.service.NotificationService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

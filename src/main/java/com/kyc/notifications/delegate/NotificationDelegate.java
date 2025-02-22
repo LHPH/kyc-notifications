@@ -1,8 +1,9 @@
 package com.kyc.notifications.delegate;
 
+import com.kyc.core.model.notifications.NotificationData;
+import com.kyc.core.model.notifications.NotificationDetail;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
-import com.kyc.notifications.model.NotificationData;
 import com.kyc.notifications.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class NotificationDelegate {
         return notificationService.addNotification(req).toResponseEntity();
     }
 
-    public ResponseEntity<ResponseData<List<NotificationData>>> getNotifications(RequestData<Void> req){
+    public ResponseEntity<ResponseData<List<NotificationDetail>>> getNotifications(RequestData<Void> req){
 
         return notificationService.getNotifications(req).toResponseEntity();
     }

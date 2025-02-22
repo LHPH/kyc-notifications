@@ -2,10 +2,13 @@ package com.kyc.notifications.service;
 
 import com.kyc.core.exception.KycRestException;
 import com.kyc.core.model.MessageData;
+import com.kyc.core.model.jwt.JwtData;
+import com.kyc.core.model.notifications.NotificationData;
+import com.kyc.core.model.notifications.NotificationDetail;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import com.kyc.core.properties.KycMessages;
-import com.kyc.notifications.model.NotificationData;
+import com.kyc.core.util.TokenUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +17,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.kyc.core.constants.GeneralConstants.ID_RECIPIENT;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_002;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_003;
 
@@ -30,7 +35,7 @@ public class NotificationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
 
     @Autowired
-    private RedisTemplate<String,NotificationData> redisTemplate;
+    private RedisTemplate<String,NotificationDetail> redisTemplate;
 
     @Autowired
     private KycMessages kycMessages;
@@ -40,39 +45,49 @@ public class NotificationService {
 
     public ResponseData<Void> addNotification(RequestData<NotificationData> req) {
 
+        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        JwtData jwtData = TokenUtil.transform(jwtAuthenticationToken.getToken());
+
+        Map<String,Object> headers = req.getHeaders();
+        String idRecipient = headers.get(ID_RECIPIENT).toString();
+        return addNotification(req.getBody(),String.valueOf(jwtData.getUser()), idRecipient,jwtData.getChannel());
+    }
+
+    public ResponseData<Void> addNotification(NotificationData notificationData, String idIssuer,
+                                              String idRecipient, String channel){
+
         try{
-            Map<String,Object> params = req.getPathParams();
-            String clientNumber = params.get("receiver").toString();
-            LOGGER.info("Processing request to save the notification for {}",clientNumber);
+            LOGGER.info("Processing request to save the notification for {}",idRecipient);
 
-            NotificationData notificationData = req.getBody();
-            notificationData.setDate(new Date());
+            NotificationDetail notificationDetail = new NotificationDetail(notificationData);
+            notificationDetail.setIssuer(idIssuer);
+            notificationDetail.setRecipient(idRecipient);
+            notificationDetail.setChannel(channel);
 
-            Long notificationCount = getNotificationsCountByCustomer(clientNumber);
+            Long notificationCount = getNotificationsCountByCustomer(idRecipient);
             notificationCount++;
 
-            LOGGER.info("Checking the number of notifications that {} has",clientNumber);
+            LOGGER.info("Checking the number of notifications that {} has",idRecipient);
             if(notificationCount<=numberNotificationsByUser){
 
-                LOGGER.info("Saving the new notification in redis for {}",clientNumber);
-                redisTemplate.opsForList().leftPush(clientNumber,notificationData);
+                LOGGER.info("Saving the new notification in redis for {}",idRecipient);
+                redisTemplate.opsForList().leftPush(idRecipient,notificationDetail);
                 return ResponseData.emptyResponse();
             }
 
-            LOGGER.warn("The {} exceed the limit of notifications for user",clientNumber);
+            LOGGER.warn("The {} exceed the limit of notifications for user",idRecipient);
             MessageData messageData = kycMessages.getMessage(MESSAGE_002);
             throw KycRestException.builderRestException()
-                    .inputData(req)
+                    .inputData(notificationData)
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .errorData(messageData)
                     .build();
-
         }
         catch (DataAccessException ex){
 
             MessageData messageData = kycMessages.getMessage(MESSAGE_003);
             throw KycRestException.builderRestException()
-                    .inputData(req)
+                    .inputData(notificationData)
                     .exception(ex)
                     .status(HttpStatus.SERVICE_UNAVAILABLE)
                     .errorData(messageData)
@@ -80,22 +95,24 @@ public class NotificationService {
         }
     }
 
-    public ResponseData<List<NotificationData>> getNotifications(RequestData<Void> req){
+    public ResponseData<List<NotificationDetail>> getNotifications(RequestData<Void> req){
 
         try{
-            Map<String,Object> params = req.getPathParams();
-            String clientNumber = params.get("client").toString();
+            JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            JwtData jwtData = TokenUtil.transform(jwtAuthenticationToken.getToken());
 
-            LOGGER.info("Retrieving the notifications for {}",clientNumber);
-            List<NotificationData> notifications = new ArrayList<>();
+            String userId = String.valueOf(jwtData.getUser());
 
-            Long notificationsCount = getNotificationsCountByCustomer(clientNumber);
-            LOGGER.info("The customer {} has {} notifications in redis",clientNumber,notificationsCount);
+            LOGGER.info("Retrieving the notifications for {}",userId);
+            List<NotificationDetail> notifications = new ArrayList<>();
+
+            Long notificationsCount = getNotificationsCountByCustomer(userId);
+            LOGGER.info("The customer {} has {} notifications in redis",userId,notificationsCount);
             if(notificationsCount>0){
 
-                notifications = redisTemplate.opsForList().leftPop(clientNumber,notificationsCount);
+                notifications = redisTemplate.opsForList().leftPop(userId,notificationsCount);
             }
-            LOGGER.info("Returning the found notifications for {}",clientNumber);
+            LOGGER.info("Returning the found notifications for {}",userId);
             return ResponseData.of(notifications);
         }
         catch(DataAccessException ex){
@@ -110,17 +127,17 @@ public class NotificationService {
         }
     }
 
-    public Long getNotificationsCountByCustomer(String clientNumber){
+    public Long getNotificationsCountByCustomer(String userIdRecipient){
 
         try{
-            LOGGER.info("Getting the number of notifications for {}",clientNumber);
-            return ObjectUtils.defaultIfNull(redisTemplate.opsForList().size(clientNumber),0L);
+            LOGGER.info("Getting the number of notifications for {}",userIdRecipient);
+            return ObjectUtils.defaultIfNull(redisTemplate.opsForList().size(userIdRecipient),0L);
         }
         catch(DataAccessException ex){
 
             MessageData messageData = kycMessages.getMessage(MESSAGE_003);
             throw KycRestException.builderRestException()
-                    .inputData(clientNumber)
+                    .inputData(userIdRecipient)
                     .exception(ex)
                     .status(HttpStatus.SERVICE_UNAVAILABLE)
                     .errorData(messageData)

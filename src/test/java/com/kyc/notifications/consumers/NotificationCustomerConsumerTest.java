@@ -1,7 +1,6 @@
 package com.kyc.notifications.consumers;
 
-import com.kyc.core.model.web.RequestData;
-import com.kyc.notifications.model.NotificationData;
+import com.kyc.core.model.notifications.NotificationData;
 import com.kyc.notifications.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -26,6 +26,6 @@ public class NotificationCustomerConsumerTest {
     public void receiverMessage_receiveData_dataWasProcessed(){
 
         consumer.receiverMessage(new NotificationData(),"token","9999","channel");
-        verify(service,times(1)).addNotification(any(RequestData.class));
+        verify(service,times(1)).addNotification(any(NotificationData.class),anyString(),anyString(),anyString());
     }
 }

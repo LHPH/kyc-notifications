@@ -1,9 +1,11 @@
 package com.kyc.notifications.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kyc.core.model.notifications.NotificationData;
+import com.kyc.core.model.notifications.NotificationDetail;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.notifications.delegate.NotificationDelegate;
-import com.kyc.notifications.model.NotificationData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
-import java.util.Date;
 
+import static com.kyc.core.constants.GeneralConstants.ID_RECIPIENT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,15 +50,15 @@ public class NotificationControllerTest {
 
         notificationData = new NotificationData();
         notificationData.setMessage("TEST");
-        notificationData.setDate(new Date());
         notificationData.setEvent("INFO");
 
         httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.AUTHORIZATION,"token");
         httpHeaders.add("channel","channel");
-        httpHeaders.add("kyc-customer-id-receiver","999");
+        httpHeaders.add(ID_RECIPIENT,"999");
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         JacksonTester.initFields(this,mapper);
     }
 
@@ -81,7 +83,7 @@ public class NotificationControllerTest {
     public void getNotifications_processRequest_returnSuccessfulResponse() throws Exception{
 
         given(delegate.getNotifications(any(RequestData.class)))
-                .willReturn(ResponseEntity.ok(Collections.singleton(notificationData)));
+                .willReturn(ResponseEntity.ok(Collections.singleton(new NotificationDetail())));
 
         mockMvc.perform(get("/").headers(httpHeaders))
                 .andDo(print())

@@ -1,11 +1,14 @@
 package com.kyc.notifications.config;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kyc.core.config.BuildDetailConfig;
 import com.kyc.core.config.RedisConfig;
 import com.kyc.core.exception.handlers.KycGenericRestExceptionHandler;
 import com.kyc.core.exception.handlers.KycUnhandledExceptionHandler;
 import com.kyc.core.exception.handlers.KycValidationRestExceptionHandler;
 import com.kyc.core.properties.KycMessages;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -15,6 +18,7 @@ import static com.kyc.notifications.constants.AppConstants.MESSAGE_001;
 
 @Configuration
 @Import(value = {RedisConfig.class, KycMessages.class, BuildDetailConfig.class, KycGenericRestExceptionHandler.class})
+@EnableFeignClients(basePackages = "com.kyc.core.rest.feign.common")
 public class AppConfig {
 
     @Bean
@@ -27,5 +31,10 @@ public class AppConfig {
     public KycValidationRestExceptionHandler kycValidationRestExceptionHandler(KycMessages kycMessages){
 
         return new KycValidationRestExceptionHandler(kycMessages.getMessage(MESSAGE_001));
+    }
+
+    @Bean
+    public Module javaTimeModule(){
+        return new JavaTimeModule();
     }
 }

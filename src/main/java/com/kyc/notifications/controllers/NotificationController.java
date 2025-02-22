@@ -1,11 +1,11 @@
 package com.kyc.notifications.controllers;
 
+import com.kyc.core.model.notifications.NotificationData;
+import com.kyc.core.model.notifications.NotificationDetail;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import com.kyc.notifications.delegate.NotificationDelegate;
-import com.kyc.notifications.model.NotificationData;
 import jakarta.validation.Valid;
-import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kyc.core.constants.GeneralConstants.CHANNEL;
+import static com.kyc.core.constants.GeneralConstants.ID_RECIPIENT;
+
 @RestController
 @Validated
 public class NotificationController {
@@ -27,18 +30,14 @@ public class NotificationController {
     private NotificationDelegate delegate;
 
     @PostMapping("/notification")
-    public ResponseEntity<ResponseData<Void>> addNotification(@RequestHeader("Authorization") String token,
-                                                              @RequestHeader("kyc-customer-id-receiver") Long customerId,
-                                                              @RequestHeader("channel") String channel,
+    public ResponseEntity<ResponseData<Void>> addNotification(@RequestHeader(ID_RECIPIENT) Long userIdRecipient,
                                                               @RequestBody @Valid NotificationData notificationData){
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("sender",token);
-        params.put("receiver",customerId);
-        params.put("channel",channel);
+        Map<String,Object> headers = new HashMap<>();
+        headers.put(ID_RECIPIENT,userIdRecipient);
 
         RequestData<NotificationData> req = RequestData.<NotificationData>builder()
-                .pathParams(params)
+                .headers(headers)
                 .body(notificationData)
                 .build();
 
@@ -46,12 +45,10 @@ public class NotificationController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<ResponseData<List<NotificationData>>> getNotifications(@RequestHeader("Authorization") String token,
-                                                                                 @RequestHeader("channel") String channel){
+    public ResponseEntity<ResponseData<List<NotificationDetail>>> getNotifications(@RequestHeader(CHANNEL) String channel){
 
         Map<String,Object> params = new HashMap<>();
-        params.put(HttpHeaders.AUTHORIZATION,token.replace("Bearer ",""));
-        params.put("channel",channel);
+        params.put(CHANNEL,channel);
 
         RequestData<Void> req = RequestData.<Void>builder()
                 .headers(params)
