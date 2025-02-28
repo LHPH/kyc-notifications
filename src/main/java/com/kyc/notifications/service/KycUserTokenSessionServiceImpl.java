@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import static com.kyc.notifications.constants.AppConstants.MESSAGE_004;
+
 @Service
 public class KycUserTokenSessionServiceImpl implements KycUserTokenSessionService {
 
@@ -31,14 +33,12 @@ public class KycUserTokenSessionServiceImpl implements KycUserTokenSessionServic
         }
         catch(FeignException e){
 
-            MessageData messageData = kycMessages.getMessage("");
+            MessageData messageData = kycMessages.getMessage(MESSAGE_004);
             throw KycRestException.builderRestException()
-                    .exception(e)
                     .inputData(token)
                     .status(HttpStatus.FORBIDDEN)
                     .errorData(messageData)
                     .build();
-
         }
     }
 }

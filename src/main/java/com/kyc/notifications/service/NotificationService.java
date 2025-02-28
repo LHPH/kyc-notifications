@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kyc.core.constants.GeneralConstants.ID_RECIPIENT;
+import static com.kyc.notifications.constants.AppConstants.KEY_PREFIX;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_002;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_003;
 
@@ -71,7 +72,7 @@ public class NotificationService {
             if(notificationCount<=numberNotificationsByUser){
 
                 LOGGER.info("Saving the new notification in redis for {}",idRecipient);
-                redisTemplate.opsForList().leftPush(idRecipient,notificationDetail);
+                redisTemplate.opsForList().leftPush(generateKey(idRecipient),notificationDetail);
                 return ResponseData.emptyResponse();
             }
 
@@ -110,7 +111,7 @@ public class NotificationService {
             LOGGER.info("The customer {} has {} notifications in redis",userId,notificationsCount);
             if(notificationsCount>0){
 
-                notifications = redisTemplate.opsForList().leftPop(userId,notificationsCount);
+                notifications = redisTemplate.opsForList().leftPop(generateKey(userId),notificationsCount);
             }
             LOGGER.info("Returning the found notifications for {}",userId);
             return ResponseData.of(notifications);
@@ -131,7 +132,7 @@ public class NotificationService {
 
         try{
             LOGGER.info("Getting the number of notifications for {}",userIdRecipient);
-            return ObjectUtils.defaultIfNull(redisTemplate.opsForList().size(userIdRecipient),0L);
+            return ObjectUtils.defaultIfNull(redisTemplate.opsForList().size(generateKey(userIdRecipient)),0L);
         }
         catch(DataAccessException ex){
 
@@ -143,6 +144,10 @@ public class NotificationService {
                     .errorData(messageData)
                     .build();
         }
+    }
+
+    private String generateKey(String idRecipient){
+        return KEY_PREFIX + idRecipient;
     }
 
 }

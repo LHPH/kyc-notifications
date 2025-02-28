@@ -28,8 +28,8 @@ public class NotificationCustomerConsumer {
     private NotificationService notificationService;
 
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name="kyc-queue-1",durable = "false"),
-            exchange = @Exchange(type = "topic",name = "kyc.customers",durable = "false"),
+            value = @Queue(name="kyc-queue-1",durable = "true"),
+            exchange = @Exchange(type = "topic",name = "kyc.customers",durable = "true"),
             key = "kyc.customers.*"),errorHandler = "logRabbitErrorHandler", returnExceptions = "true"
     )
     public void receiverMessage(@Payload @Valid NotificationData notificationData,

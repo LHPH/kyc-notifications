@@ -1,7 +1,11 @@
 package com.kyc.notifications.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kyc.core.properties.KycMessages;
+import com.kyc.core.security.jwt.BearerTokenAuthenticationEntryPointDelegate;
 import com.kyc.core.security.jwt.KycUserSessionTokenJwtDecoder;
 import com.kyc.core.security.jwt.KycUserTokenSessionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,10 +18,18 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.kyc.notifications.constants.AppConstants.MESSAGE_004;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class ResourceServerSecurityConfig {
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private KycMessages kycMessages;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -29,8 +41,17 @@ public class ResourceServerSecurityConfig {
         }));
         http.formLogin(FormLoginConfigurer::disable);
         http.httpBasic(HttpBasicConfigurer::disable);
-        http.oauth2ResourceServer(customizer -> customizer.jwt(Customizer.withDefaults()));
+        http.oauth2ResourceServer(customizer -> customizer
+                .jwt(Customizer.withDefaults())
+                .authenticationEntryPoint(bearerTokenAuthenticationEntryPointDelegate()));
+        http.exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(bearerTokenAuthenticationEntryPointDelegate()));
         return http.build();
+    }
+
+    @Bean
+    public BearerTokenAuthenticationEntryPointDelegate bearerTokenAuthenticationEntryPointDelegate(){
+        return new BearerTokenAuthenticationEntryPointDelegate(kycMessages.getMessage(MESSAGE_004),objectMapper);
     }
 
     @Bean

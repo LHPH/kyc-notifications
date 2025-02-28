@@ -55,3 +55,7 @@ kyc-messages:
         code: KYC-NOTIFICATIONS-003
         message: The operation could not be performed
         type: ERROR
+      "004":
+        code: KYC-NOTIFICATIONS-004
+        message: The request is unauthorized
+        type: ERROR
