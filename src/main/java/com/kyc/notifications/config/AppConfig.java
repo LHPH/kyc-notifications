@@ -1,7 +1,5 @@
 package com.kyc.notifications.config;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kyc.core.config.BuildDetailConfig;
 import com.kyc.core.config.RedisConfig;
 import com.kyc.core.exception.handlers.KycGenericRestExceptionHandler;
@@ -31,10 +29,5 @@ public class AppConfig {
     public KycValidationRestExceptionHandler kycValidationRestExceptionHandler(KycMessages kycMessages){
 
         return new KycValidationRestExceptionHandler(kycMessages.getMessage(MESSAGE_001));
-    }
-
-    @Bean
-    public Module javaTimeModule(){
-        return new JavaTimeModule();
     }
 }

@@ -1,6 +1,5 @@
 package com.kyc.notifications.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kyc.core.properties.KycMessages;
 import com.kyc.core.security.jwt.BearerTokenAuthenticationEntryPointDelegate;
 import com.kyc.core.security.jwt.KycUserSessionTokenJwtDecoder;
@@ -17,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.FormLoginC
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import tools.jackson.databind.json.JsonMapper;
 
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_004;
 
@@ -26,7 +26,7 @@ import static com.kyc.notifications.constants.AppConstants.MESSAGE_004;
 public class ResourceServerSecurityConfig {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper objectMapper;
 
     @Autowired
     private KycMessages kycMessages;

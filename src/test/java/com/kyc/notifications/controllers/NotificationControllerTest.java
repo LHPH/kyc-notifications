@@ -1,7 +1,5 @@
 package com.kyc.notifications.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kyc.core.model.notifications.NotificationData;
 import com.kyc.core.model.notifications.NotificationDetail;
 import com.kyc.core.model.web.RequestData;
@@ -9,15 +7,16 @@ import com.kyc.notifications.delegate.NotificationDelegate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Collections;
 
@@ -37,7 +36,7 @@ public class NotificationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private NotificationDelegate delegate;
 
     private NotificationData notificationData;
@@ -57,8 +56,7 @@ public class NotificationControllerTest {
         httpHeaders.add("channel","channel");
         httpHeaders.add(ID_RECIPIENT,"999");
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+        JsonMapper mapper = new JsonMapper();
         JacksonTester.initFields(this,mapper);
     }
 
