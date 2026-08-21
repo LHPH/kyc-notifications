@@ -59,3 +59,4 @@ kyc-messages:
         code: KYC-NOTIFICATIONS-004
         message: The request is unauthorized
         type: ERROR
+        hint: AUTH

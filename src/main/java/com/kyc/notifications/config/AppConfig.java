@@ -1,6 +1,7 @@
 package com.kyc.notifications.config;
 
 import com.kyc.core.config.BuildDetailConfig;
+import com.kyc.core.config.EnableMockResourceServerSecurityConfig;
 import com.kyc.core.config.RedisConfig;
 import com.kyc.core.exception.handlers.KycGenericRestExceptionHandler;
 import com.kyc.core.exception.handlers.KycUnhandledExceptionHandler;
@@ -15,7 +16,13 @@ import static com.kyc.notifications.constants.AppConstants.MESSAGE_000;
 import static com.kyc.notifications.constants.AppConstants.MESSAGE_001;
 
 @Configuration
-@Import(value = {RedisConfig.class, KycMessages.class, BuildDetailConfig.class, KycGenericRestExceptionHandler.class})
+@Import(value = {
+        RedisConfig.class,
+        KycMessages.class,
+        BuildDetailConfig.class,
+        KycGenericRestExceptionHandler.class,
+        EnableMockResourceServerSecurityConfig.class
+})
 @EnableFeignClients(basePackages = "com.kyc.core.rest.feign.common")
 public class AppConfig {
 

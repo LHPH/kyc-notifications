@@ -105,7 +105,7 @@ public class NotificationServiceTest {
             given(listOperations.size(anyString())).willReturn(10L);
             service.addNotification(req);
         });
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY,ex.getStatus());
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_CONTENT,ex.getStatus());
     }
 
     @Test

@@ -80,7 +80,7 @@ public class NotificationService {
             MessageData messageData = kycMessages.getMessage(MESSAGE_002);
             throw KycRestException.builderRestException()
                     .inputData(notificationData)
-                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .status(HttpStatus.UNPROCESSABLE_CONTENT)
                     .errorData(messageData)
                     .build();
         }
@@ -132,7 +132,7 @@ public class NotificationService {
 
         try{
             LOGGER.info("Getting the number of notifications for {}",userIdRecipient);
-            return ObjectUtils.defaultIfNull(redisTemplate.opsForList().size(generateKey(userIdRecipient)),0L);
+            return ObjectUtils.getIfNull(redisTemplate.opsForList().size(generateKey(userIdRecipient)),()->0L);
         }
         catch(DataAccessException ex){
 
